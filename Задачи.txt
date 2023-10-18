@@ -1,0 +1,25 @@
+Задача 1.
+
+SELECT t1.* FROM users t1 LEFT JOIN users t2 ON t1.invited_by_user_id = t2.id WHERE t1.posts_qty > t2.posts_qty;
+
+Задача 2.
+
+SELECT id, group_id, invited_by_user_id, name, posts_qty FROM(
+  SELECT *, ROW_NUMBER() OVER(PARTITION BY group_id ORDER BY posts_qty DESC) rn FROM users
+) t WHERE rn = 1;
+
+Задача 3.
+
+SELECT g.id, g.name FROM groups g LEFT JOIN (
+  SELECT group_id, count(DISTINCT id) cnt FROM users GROUP BY group_id
+) u ON  g.id = u.group_id WHERE u.cnt > 10000;
+
+Задача 4.
+
+SELECT t1.* FROM users t1 LEFT JOIN users t2 ON t1.invited_by_user_id = t2.id WHERE t1.group_id != t2.group_id;
+
+Задача 5.
+
+SELECT t1.id, t1.name FROM groups t1 LEFT JOIN (
+  SELECT group_id, ROW_NUMBER() OVER(ORDER BY sum(posts_qty) DESC) rn FROM users GROUP BY group_id
+) t2 ON  t1.id = t2.group_id WHERE rn = 1;
